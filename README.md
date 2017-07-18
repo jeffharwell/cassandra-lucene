@@ -1,23 +1,22 @@
-# cassandra
+# cassandra-lucene
 
 ## General
 
+Cassandra docker image with the Stratio Cassandra Lucene Index plugin Installed. It is based on gcr.io/google-samples/cassandra:v12, which uses Cassandra 3.9.0, with the addition of the Stratio Cassandra Lucene Index plugin. This image is ment to be a a drop in replacement for gcr.io/google-samples/cassandra:v12 in the [Kubernetics Example: Deploying Cassandra with Stateful Sets](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/).
 
-Cassandra docker image with Stratio Lucene Plugin Installed it is based on gcr.io/google-samples/cassandra:v12, which uses Cassandra 3.9.0, and adds the (Stratio Cassandra Lucene Index plugin.
-
-The plugin was compiled as per the documentation in the readme on [https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0](https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0). 
+The plugin was compiled as per the documentation in the readme.rst on [https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0](https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0). 
 
 ## Testing/Demo
 
 Use the test script: sh ./test_with_cqlsh.sh
 
-The image is pretty minimal so it is a bit tricky to test so you cannot use the container's cqlsh. The test script uses the cqlsh from the offical cassandra container to connect to the image jeffharwell/cassandra image and create a test search on a small amount of data.
+The image is pretty minimal so it is a bit tricky to test as you cannot use the container's cqlsh. The test script uses cqlsh from the offical cassandra container to connect to the jeffharwell/cassandra image and create a test search on a small amount of sample data.
 
 #### The Test
 
-This is roughly what the test script is doing. You can run the following in cqlsh connected to a running jeffharwell/cassandra container.
+This is roughly what the test script is doing. You can run the following in cqlsh connected to a running jeffharwell/cassandra container to test it by hand. If you want to do this the [official Cassandra image](https://hub.docker.com/r/_/cassandra/) has some documentation that will be helpful.
 
-This example comes from the (https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0)[https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0] readme.md with a few modifications.
+This example comes from the [https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0](https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0) readme.md with a few modifications. See that link for several more examples of the plugin in action.
 
     CREATE KEYSPACE demo
     WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1};
