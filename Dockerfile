@@ -6,8 +6,9 @@ MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 
 ## Download and install the Lucene Index plugin. The compiled binary is at www.jeffharwell.com
 RUN apt-get -y update && \
+    apt-get -y -o Dpkg::Options::="--force-confold" upgrade cassandra && \
     apt-get -y upgrade && \
-    apt-get install wget && \
+    apt-get -y install wget && \
     wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.11.1.0.jar && \
     mv ./cassandra-lucene-index-plugin-3.11.1.0.jar ${CASSANDRA_HOME}/lib/ && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

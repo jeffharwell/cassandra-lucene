@@ -2,7 +2,7 @@
 
 ## General
 
-Cassandra docker image with the Stratio Cassandra Lucene Index plugin Installed. It is based on gcr.io/google-samples/cassandra:v12, which uses Cassandra 3.9.0, with the addition of the Stratio Cassandra Lucene Index plugin. This image is meant to be a a drop in replacement for gcr.io/google-samples/cassandra:v12 in the [Kubernetics Example: Deploying Cassandra with Stateful Sets](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/).
+Cassandra docker image with the Stratio Cassandra Lucene Index plugin Installed. It is based on launcher.gcr.io/google/cassandra3:3.11, and uses Cassandra 3.11.3, with the addition of the Stratio Cassandra Lucene Index plugin version 3.11.1.0. This image is meant to be a a drop in replacement for gcr.io/google-samples/cassandra:v12 in the [Kubernetics Example: Deploying Cassandra with Stateful Sets](https://kubernetes.io/docs/tutorials/stateful-application/cassandra/).
 
 The plugin was compiled as per the documentation in readme.rst on [https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0](https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0). 
 
