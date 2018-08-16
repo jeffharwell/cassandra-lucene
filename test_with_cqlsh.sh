@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Starting Cassandra with Stratio Cassandra Lucene Index"
-sudo docker run -d --rm --name cassandra jeffharwell/cassandra:v12
+sudo docker run -d --rm --name cassandra jeffharwell/cassandra:3.11.3.0v3
 
 echo "Waiting 30 seconds for Cassandra to start"
 echo "If you get a 'Unable to connect to any servers' message you may need to lengthen this timeout."
@@ -13,7 +13,7 @@ sleep 30
 ## https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0
 
 echo "Starting cqlsh container"
-sudo docker run -it --name cqlsh --link cassandra:cassandra --rm cassandra:3.9 sh -c "exec cqlsh cassandra <<EOF
+sudo docker run -it --name cqlsh --link cassandra:cassandra --rm cassandra:3.11 sh -c "exec cqlsh cassandra <<EOF
     -- create the keyspace and the table
     CREATE KEYSPACE demo 
     WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1}; 
