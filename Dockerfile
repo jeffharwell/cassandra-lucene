@@ -1,4 +1,4 @@
-FROM gcr.io/google-samples/cassandra:v12
+FROM launcher.gcr.io/google/cassandra3:3.11
 MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 
 ## This is, of course, non-ideal.
@@ -8,6 +8,6 @@ MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 RUN apt-get -y update && \
     apt-get -y upgrade && \
     apt-get install wget && \
-    wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.9.0.jar && \
-    mv ./cassandra-lucene-index-plugin-3.9.0.jar ${CASSANDRA_HOME}/lib/ && \
+    wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.11.1.0.jar && \
+    mv ./cassandra-lucene-index-plugin-3.11.1.0.jar ${CASSANDRA_HOME}/lib/ && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
