@@ -5,7 +5,9 @@ MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 ## If I had the dockerfile for the GCR image I would do this differently
 
 ## Download and install the Lucene Index plugin. The compiled binary is at www.jeffharwell.com
-RUN apt-get -y update && \
+COPY ./ready-probe.sh /
+RUN chmod +x /ready-probe.sh && \
+    apt-get -y update && \
     apt-get -y -o Dpkg::Options::="--force-confold" upgrade cassandra && \
     apt-get -y upgrade && \
     apt-get -y install wget && \
