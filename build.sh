@@ -5,4 +5,5 @@ if [ 'root' != `whoami` ]; then
     exit 1
 fi
 
-docker build -t jeffharwell/cassandra:3.11.3.0v3 .
+VERSION=`head -n 1 ./currentversion`
+docker build -t jeffharwell/cassandra:${VERSION} .

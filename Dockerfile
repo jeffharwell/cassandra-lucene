@@ -14,3 +14,6 @@ RUN chmod +x /ready-probe.sh && \
     wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.11.1.0.jar && \
     mv ./cassandra-lucene-index-plugin-3.11.1.0.jar /usr/share/cassandra/lib/ && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY ./docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+RUN mkdir /cassandra_data && chown cassandra /cassandra_data

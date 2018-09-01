@@ -1,7 +1,8 @@
 #!/bin/bash
 
+VERSION=`head -n 1 ./currentversion`
 echo "Starting Cassandra with Stratio Cassandra Lucene Index"
-sudo docker run -d --rm --name cassandra jeffharwell/cassandra:3.11.3.0v3
+sudo docker run -d --rm --name cassandra jeffharwell/cassandra:${VERSION}
 
 echo "Waiting 30 seconds for Cassandra to start"
 echo "If you get a 'Unable to connect to any servers' message you may need to lengthen this timeout."
