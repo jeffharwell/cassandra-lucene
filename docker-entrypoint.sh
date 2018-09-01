@@ -25,8 +25,32 @@ fi
 if [ "$1" = 'cassandra' -a "$(id -u)" = '0' ]; then
 	chown -R cassandra /var/lib/cassandra /var/log/cassandra "$CASSANDRA_CONFIG"
 	exec gosu cassandra "$BASH_SOURCE" "$@"
+    ## Make sure cassandra has rights on the cassandra-data directory, this is where you would
+    ## mount persistant storage in a cluster environment.
+    chown -R cassandra /cassandra_data
 fi
 
+function create_directory_set_permissions () {
+    ## first make sure that the variable isn't empty
+    if [ -n "${1:+1}" ]; then
+        ## The enviroment value may have actual quotes, must strip those off (subtle)
+        DIR=$(echo $1 | sed 's/^\"//g' | sed 's/\"$//g')
+        if [ ! -d ${DIR} ]; then
+            ## If it doesn't exist create it
+            mkdir -p ${DIR}
+		fi
+        ## regardless make sure cassandra owns it
+        chown -R cassandra ${DIR}
+    fi
+}
+
+## Create and give proper permissions to our data, hints, and commitlog directories
+## if they are defined (the function above takes care of that check
+create_directory_set_permissions ${CASSANDRA_DATA_FILE_DIRECTORIES}
+create_directory_set_permissions ${CASSANDRA_HINTS_DIRECTORY}
+create_directory_set_permissions ${CASSANDRA_COMMITLOG_DIRECTORY}
+
+## Write environmental variables into the $CASSANDRA_CONFIG/cassandra.yaml file
 if [ "$1" = 'cassandra' ]; then
 	: ${CASSANDRA_RPC_ADDRESS='0.0.0.0'}
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 VERSION=`head -n 1 ./currentversion`
+echo "Testing Version ${VERSION}"
 echo "Starting Cassandra with Stratio Cassandra Lucene Index"
 sudo docker run -d --rm --name cassandra jeffharwell/cassandra:${VERSION}
 
