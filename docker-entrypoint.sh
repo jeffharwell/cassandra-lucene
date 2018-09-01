@@ -14,33 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-
-# first arg is `-f` or `--some-option`
-if [ "${1:0:1}" = '-' ]; then
-	set -- cassandra -f "$@"
-fi
-
-# allow the container to be started with `--user`
-if [ "$1" = 'cassandra' -a "$(id -u)" = '0' ]; then
-	chown -R cassandra /var/lib/cassandra /var/log/cassandra "$CASSANDRA_CONFIG"
-	exec gosu cassandra "$BASH_SOURCE" "$@"
-    ## Make sure cassandra has rights on the cassandra-data directory, this is where you would
-    ## mount persistant storage in a cluster environment.
-    chown -R cassandra /cassandra_data
-fi
-
+## Define some functions
 create_directory_set_permissions() {
     ## first make sure that the variable isn't empty
-    whoami
-    echo "Varible is: --${1}--"
+    #whoami
+    #echo "Varible is: --${1}--"
     if [ ! -z ${1+x} ]; then
         ## The enviroment value may have actual quotes, must strip those off (subtle)
         DIR=$(echo $1 | sed 's/^\"//g' | sed 's/\"$//g')
-        echo "Directory is --${DIR}--"
+        #echo "Directory is --${DIR}--"
         if [ ! -d ${DIR} ]; then
             ## If it doesn't exist create it
-            echo "Creating Directory ${DIR}"
+            #echo "Creating Directory ${DIR}"
             mkdir -p ${DIR}     
         fi
         ## regardless make sure cassandra owns it
@@ -48,11 +33,68 @@ create_directory_set_permissions() {
     fi
 }
 
-## Create and give proper permissions to our data, hints, and commitlog directories
-## if they are defined (the function above takes care of that check
-create_directory_set_permissions ${CASSANDRA_DATA_FILE_DIRECTORIES}
-create_directory_set_permissions ${CASSANDRA_HINTS_DIRECTORY}
-create_directory_set_permissions ${CASSANDRA_COMMITLOG_DIRECTORY}
+
+## This says that every variable defined is automatically push to the environment and 
+## accessible to child processes.
+set -e
+
+## For debugging - if you want to understand the script flow.
+## this would print twice, once as root, and then again as the cassandra
+## user once gosu is used to re-run this script.
+#echo "Script Run:"
+#echo "I am: "
+#whoami
+#echo "I've been called with arguments: "
+#echo "$@"
+#echo "---"
+
+##
+## In the Dockerfile the CMD section is as follows:
+##             "Cmd": [
+##                "cassandra",
+##                "-f"
+##            ],
+##
+## So this script will be called as ./docker-entrypoint.sh cassandra -f
+
+# first arg is `-f` or `--some-option`
+# Basically the first argument needs to be the executable that we will eventually execute way at the
+# end of the script. This section allows you to call the script and not specify cassandra as the 
+# executable and it will go ahead and insert it. This isn't necessary in the specific case of this dockerfile
+# because CMD is set up to always pass 'cassandra' as the first argument.
+#
+# In terms of syntax:
+# ${1:0:1} the first 1 is the variable, the :0:1 takes the first character of the varible
+if [ "${1:0:1}" = '-' ]; then
+    ## see https://unix.stackexchange.com/questions/308260/what-does-set-do-in-this-dockerfile-entrypoint
+    ## this puts the string "cassandra" in $1 and pushes eveything else forward
+	set -- cassandra -f "$@"
+fi
+
+# If our first argument is cassandra (it it will be, see above) then re-run this script as the Cassandra user
+if [ "$1" = 'cassandra' -a "$(id -u)" = '0' ]; then
+    ## Before we drop privileges create the directories with proper permissions
+	create_directory_set_permissions ${CASSANDRA_DATA_FILE_DIRECTORIES}
+	create_directory_set_permissions ${CASSANDRA_HINTS_DIRECTORY}
+	create_directory_set_permissions ${CASSANDRA_COMMITLOG_DIRECTORY}
+
+	chown -R cassandra /var/lib/cassandra /var/log/cassandra "$CASSANDRA_CONFIG"
+    ## BASH_SOURCE is built in, it is the relative name of the current bash script
+    ## gosu just runs the whole thing as a specific user (it is an installed binary)
+    ##
+    ## Interestingly executing gosu here essentially ends the current execution, none of the
+    ## other commands in this script will ever get executed as root. This run of the script ends
+    ## at this point. When the process called by gosu finishes we do not return and finish
+    ## executing this script as root.
+	exec gosu cassandra "$BASH_SOURCE" "$@"
+fi
+
+## For debugging - if you want to understand the flow
+## It shows that you never get to this point as root, only as the cassandra user
+#
+#echo "I am"
+#whoami
+#echo "and I've proceeded past the gosu command"
 
 ## Write environmental variables into the $CASSANDRA_CONFIG/cassandra.yaml file
 if [ "$1" = 'cassandra' ]; then
@@ -138,4 +180,6 @@ data_file_directories: \
 	done
 fi
 
+## Because of the gosu earlier in the script we will never hit this exec as root and actually call cassandra
+## this is run as the cassandra user, and calls cassandra.
 exec "$@"
