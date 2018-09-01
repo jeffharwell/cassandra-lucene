@@ -30,15 +30,19 @@ if [ "$1" = 'cassandra' -a "$(id -u)" = '0' ]; then
     chown -R cassandra /cassandra_data
 fi
 
-function create_directory_set_permissions () {
+create_directory_set_permissions() {
     ## first make sure that the variable isn't empty
-    if [ -n "${1:+1}" ]; then
+    whoami
+    echo "Varible is: --${1}--"
+    if [ ! -z ${1+x} ]; then
         ## The enviroment value may have actual quotes, must strip those off (subtle)
         DIR=$(echo $1 | sed 's/^\"//g' | sed 's/\"$//g')
+        echo "Directory is --${DIR}--"
         if [ ! -d ${DIR} ]; then
             ## If it doesn't exist create it
-            mkdir -p ${DIR}
-		fi
+            echo "Creating Directory ${DIR}"
+            mkdir -p ${DIR}     
+        fi
         ## regardless make sure cassandra owns it
         chown -R cassandra ${DIR}
     fi
