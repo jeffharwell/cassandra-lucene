@@ -16,3 +16,8 @@ RUN chmod +x /ready-probe.sh && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
+
+## There definitely a better way to do this, but we are going to go ahead 
+## and hard code the G1 garbage collector as per:
+## https://docs.datastax.com/en/archived/cassandra/3.x/cassandra/operations/opsTuneJVM.html
+COPY ./jvm.options /etc/cassandra/
