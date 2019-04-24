@@ -147,13 +147,20 @@ data_file_directories: \
         hints_directory \
         commitlog_directory \
     ; do
+        ## ^^ means make the value uppercase
+        ## https://stackoverflow.com/questions/11392189/how-to-convert-a-string-from-uppercase-to-lowercase-in-bash
 		var="CASSANDRA_${yaml^^}"
+        ## Indirect substitution, $val gets the value in the variable CASSANDRA_${yaml^^}
+        ## https://unix.stackexchange.com/questions/41292/variable-substitution-with-an-exclamation-mark-in-bash
 		val="${!var}"
         if [ "$val" ]; then
             sed -ri 's$^(# )?('"$yaml"':)(.*)$'"$yaml"': '"${val}"'$' "$CASSANDRA_CONFIG/cassandra.yaml"
         fi
     done
 
+    ## These configuration parameters should all exist in cassandra.yaml but will be commented out
+    ## if we have an environmental variable then we uncomment the line and set the value of the 
+    ## parameter to the value specifed in the environmental variable
 	for yaml in \
 		broadcast_address \
 		broadcast_rpc_address \
@@ -171,6 +178,32 @@ data_file_directories: \
 		fi
 	done
 
+    ## These are configuration paramaters that defaut to true but should be false in production.
+    ## They may or may not exist in cassandra.yaml and may or may not be commented out (yuck).
+    ##
+    ## We want to comment them out in the .yaml file if they exist and then either set 
+    ## them to false or set them to the value specified the environmental variable
+    ##
+    ## See: https://github.com/jeffharwell/cassandra-lucene/issues/1
+    ##to_disable=(materialized_views transient_replication)
+    to_disable=(materialized_views)
+    for yaml in ${to_disable[@]}; do
+        var="CASSANDRA_${yaml^^}"
+        val="${!var}"
+        ## First comment out the line in if it does exist in cassandra.yaml
+        parameter_name="enable_${yaml}"
+        sed -ri 's/^'"${parameter_name}"'/# '"${parameter_name}"'/' "$CASSANDRA_CONFIG/cassandra.yaml"
+        ## new write in the new value if we have a varible for it, otherwise disable the feature
+        if [ "$val" ]; then
+            ## We have an environmental variable specifying the value of this parameter, use that
+            echo "${parameter_name}: ${val}" >> "$CASSANDRA_CONFIG/cassandra.yaml"
+        else
+            ## There is no environmental variable specifying a value, disable the parameter
+            echo "${parameter_name}: false" >> "$CASSANDRA_CONFIG/cassandra.yaml"
+        fi
+    done
+
+
 	for rackdc in dc rack; do
 		var="CASSANDRA_${rackdc^^}"
 		val="${!var}"
@@ -178,6 +211,7 @@ data_file_directories: \
 			sed -ri 's/^('"$rackdc"'=).*/\1 '"$val"'/' "$CASSANDRA_CONFIG/cassandra-rackdc.properties"
 		fi
 	done
+
 fi
 
 ## Because of the gosu earlier in the script we will never hit this exec as root and actually call cassandra
