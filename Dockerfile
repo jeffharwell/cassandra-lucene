@@ -1,4 +1,5 @@
-FROM launcher.gcr.io/google/cassandra3:3.11
+#FROM launcher.gcr.io/google/cassandra3:3.11
+FROM gcr.io/cloud-marketplace-containers/google/cassandra3:3.11
 MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 
 ## This is, of course, non-ideal.
@@ -7,6 +8,8 @@ MAINTAINER Jeff Harwell <jeff.harwell@gmail.com>
 ## Download and install the Lucene Index plugin. The compiled binary is at www.jeffharwell.com
 COPY ./ready-probe.sh /
 RUN chmod +x /ready-probe.sh && \
+    gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv E91335D77E3E87CB && \
+    gpg --export --armor E91335D77E3E87CB | apt-key add - && \
     apt-get -y update && \
     apt-get -y -o Dpkg::Options::="--force-confold" upgrade cassandra && \
     apt-get -y upgrade && \
