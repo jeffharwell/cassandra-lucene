@@ -126,7 +126,7 @@ if [ "$1" = 'cassandra' ]; then
 
     ## this is pretty bad
     ## The data_file_directories is a multi-line configuration, which is a bit tricky to substitute
-    ## This was much best first try
+    ## This was my best first try
 	if [ -n "${CASSANDRA_DATA_FILE_DIRECTORIES:+1}" ]; then
 		## this is multi line yaml directive ... uugh ... this command get the line right after the data_file_directories line
 		next_line="$(awk 'f{print;f=0} /(^# )?(data_file_directories)/{f=1}' ${CASSANDRA_CONFIG}/cassandra.yaml)"
@@ -162,14 +162,15 @@ data_file_directories: \
     ## if we have an environmental variable then we uncomment the line and set the value of the 
     ## parameter to the value specifed in the environmental variable
 	for yaml in \
-		broadcast_address \
-		broadcast_rpc_address \
-		cluster_name \
-		endpoint_snitch \
-		listen_address \
-		num_tokens \
-		rpc_address \
-		start_rpc \
+        broadcast_address \
+        broadcast_rpc_address \
+        cluster_name \
+        endpoint_snitch \
+        listen_address \
+        num_tokens \
+        rpc_address \
+        start_rpc \
+        allocate_tokens_for_keyspace \
 	; do
 		var="CASSANDRA_${yaml^^}"
 		val="${!var}"
