@@ -11,11 +11,10 @@ RUN chmod +x /ready-probe.sh && \
     gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv E91335D77E3E87CB && \
     gpg --export --armor E91335D77E3E87CB | apt-key add - && \
     apt-get -y update && \
-    apt-get -y -o Dpkg::Options::="--force-confold" upgrade cassandra && \
     apt-get -y upgrade && \
     apt-get -y install wget && \
-    wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.11.1.0.jar && \
-    mv ./cassandra-lucene-index-plugin-3.11.1.0.jar /usr/share/cassandra/lib/ && \
+    wget http://www.jeffharwell.com/jars/cassandra-lucene-index-plugin-3.11.13.0.jar && \
+    mv ./cassandra-lucene-index-plugin-3.11.13.0.jar /opt/cassandra/lib/ && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh

@@ -142,10 +142,18 @@ data_file_directories: \
     - '"${CASSANDRA_DATA_FILE_DIRECTORIES}"'' ${CASSANDRA_CONFIG}/cassandra.yaml
 	fi
 
-
+    ## These configuration parameters all exist uncommented in the cassandra.yaml file
+    ## we will replace the existing values with new values from the environment if they exist.
     for yaml in \
         hints_directory \
         commitlog_directory \
+        read_request_timeout_in_ms \
+        range_request_timeout_in_ms \
+        write_request_timeout_in_ms \
+        counter_write_request_timeout_in_ms \
+        cas_contention_timeout_in_ms \
+        truncate_request_timeout_in_ms \
+        request_timeout_in_ms \
     ; do
         ## ^^ means make the value uppercase
         ## https://stackoverflow.com/questions/11392189/how-to-convert-a-string-from-uppercase-to-lowercase-in-bash

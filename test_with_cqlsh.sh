@@ -3,7 +3,7 @@
 VERSION=`head -n 1 ./currentversion`
 echo "Testing Version ${VERSION}"
 echo "Starting Cassandra with Stratio Cassandra Lucene Index"
-sudo docker run -d --rm --name cassandra jeffharwell/cassandra:${VERSION}
+sudo docker run -d --rm --name cassandra jeffharwell/cassandra-lucene:${VERSION}
 
 echo "Waiting 30 seconds for Cassandra to start"
 echo "If you get a 'Unable to connect to any servers' message you may need to lengthen this timeout."
@@ -12,7 +12,7 @@ sleep 30
 ## This example code is derived from the examples in the readme.md of the Stratio Cassandra Lucene
 ## Index github repository.
 ## 
-## https://github.com/Stratio/cassandra-lucene-index/tree/3.9.0
+## https://github.com/instaclustr/cassandra-lucene-index
 
 echo "Starting cqlsh container"
 sudo docker run -it --name cqlsh --link cassandra:cassandra --rm cassandra:3.11 sh -c "exec cqlsh cassandra <<EOF
@@ -60,7 +60,9 @@ sudo docker run -it --name cqlsh --link cassandra:cassandra --rm cassandra:3.11 
     CONSISTENCY QUORUM
 
     -- run the select using the index
-    SELECT message FROM tweets WHERE expr(tweets_index, '{
+    -- interestingly, the 3.11.13 version of the plugin does not support specifying
+    -- a different column then the search index, so we will use 'select *' for the test.
+    SELECT * FROM tweets WHERE expr(tweets_index, '{
        query: {type: \"phrase\", field: \"body\", value: \"include this\", slop: 1}
        }') LIMIT 100;
 EOF

@@ -6,4 +6,4 @@ if [ 'root' != `whoami` ]; then
 fi
 
 VERSION=`head -n 1 ./currentversion`
-docker build -t jeffharwell/cassandra:${VERSION} .
+docker build -t jeffharwell/cassandra-lucene:${VERSION} .
